@@ -1,58 +1,55 @@
-import { NextResponse } from "next/server";
-import { sql } from "@/lib/db-server";
+// src/app/api/about/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { about } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function GET() {
   try {
-    const data = await sql`SELECT * FROM contact ORDER BY created_at DESC`;
-    return NextResponse.json({ success: true, data });
-  } catch (e: any) {
-    return NextResponse.json({ success: true, data: [] });
+    const data = await db.select().from(about).limit(1);
+    return NextResponse.json({ success: true, data: data[0] || null });
+  } catch {
+    return NextResponse.json({ success: true, data: null });
   }
 }
 
-export async function POST(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
+    const existing = await db.select().from(about).limit(1);
     
-    // Save message to database
-    await sql`
-      INSERT INTO contact (name, email, subject, message, read, replied, created_at)
-      VALUES (${body.name}, ${body.email}, ${body.subject || null}, ${body.message}, false, false, NOW())
-    `;
-
-    // Check if email notifications are enabled in settings
-    const settings = await sql`SELECT email_notifications FROM site_settings LIMIT 1`;
-    const notificationsEnabled = settings[0]?.email_notifications ?? true;
-    
-    if (notificationsEnabled) {
-      console.log("📧 Email notification enabled - would send email to admin");
-      console.log(`   From: ${body.name} <${body.email}>`);
-      console.log(`   Subject: ${body.subject || 'No subject'}`);
-      // Here you can integrate with SendGrid, Resend, Nodemailer, etc.
+    if (existing.length > 0) {
+      await db.update(about).set({
+        name: body.name,
+        title: body.title,
+        bio: body.bio,
+        longBio: body.longBio || null,
+        dob: body.dob || null,
+        placeOfBirth: body.placeOfBirth || null,
+        gender: body.gender || null,
+        email: body.email,
+        phone: body.phone || null,
+        location: body.location || null,
+        github: body.github || null,
+        linkedin: body.linkedin || null,
+        twitter: body.twitter || null,
+        website: body.website || null,
+        avatar: body.avatar || null,
+        resume: body.resume || null,
+        updatedAt: new Date(),
+      }).where(eq(about.id, existing[0].id));
     } else {
-      console.log("🔕 Email notifications are disabled in settings");
+      await db.insert(about).values({
+        name: body.name,
+        title: body.title,
+        bio: body.bio,
+        email: body.email,
+        avatar: body.avatar || null,
+        resume: body.resume || null,
+      });
     }
-
-    return NextResponse.json({ 
-      success: true, 
-      message: "Message sent successfully!",
-      notificationSent: notificationsEnabled 
-    });
-  } catch (e: any) {
-    console.error("Contact POST error:", e.message);
-    return NextResponse.json({ success: false, error: e.message }, { status: 500 });
-  }
-}
-
-export async function PUT(request: Request) {
-  try {
-    const body = await request.json();
-    await sql`
-      UPDATE contact 
-      SET read = ${body.read ?? false}, replied = ${body.replied ?? false}
-      WHERE id = ${body.id}
-    `;
-    return NextResponse.json({ success: true, message: "Updated" });
+    
+    return NextResponse.json({ success: true, message: "Saved" });
   } catch (e: any) {
     return NextResponse.json({ success: false, error: e.message }, { status: 500 });
   }
