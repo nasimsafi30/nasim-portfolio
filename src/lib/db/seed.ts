@@ -28,13 +28,13 @@ export async function seed() {
 
   try {
     console.log("Creating admin user...");
-    const hashedPassword = await bcrypt.hash("admin123", 12);
+    const hashedPassword = await bcrypt.hash("Nasim@123", 12);
     const adminId = crypto.randomUUID();
 
     await db.insert(users).values({
       id: adminId,
       name: "Mohammad Nasim Safi",
-      email: "admin@nasimsafi.com",
+      email: "nasim.safi30@gmail.com",
       password: hashedPassword,
       role: "admin",
       emailVerified: new Date(),
@@ -54,7 +54,7 @@ export async function seed() {
       dob: "1997-04-29",
       placeOfBirth: "Nangarhar, Afghanistan",
       gender: "Male",
-      email: "nasimsafi30@gmail.com",
+      email: "nasim.safi30@gmail.com",
       phone: "+93 700 000 000",
       location: "Nangarhar, Afghanistan",
       github: "https://github.com/nasimsafi30",
@@ -192,7 +192,7 @@ export async function seed() {
     console.log("   Resume record inserted");
 
     console.log("\nDatabase seeded successfully!\n");
-    console.log("Default Admin: admin@nasimsafi.com / admin123\n");
+    console.log("Default Admin: nasim.safi30@gmail.com / Nasim@123\n");
   } catch (error) {
     console.error("Error seeding database:", error);
     throw error;
