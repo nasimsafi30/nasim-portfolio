@@ -1,0 +1,21 @@
+{
+  "name": "Mohammad Nasim Safi - Portfolio",
+  "short_name": "MNS Portfolio",
+  "description": "Full Stack Developer & IT/Networking Engineer Portfolio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/preview.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/preview.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
